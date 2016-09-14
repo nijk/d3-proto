@@ -4,5 +4,6 @@
 # Distribution
 dist/*
 
-# Dependencies
+# Node & NPM
 node_modules
+npm-debug.log
