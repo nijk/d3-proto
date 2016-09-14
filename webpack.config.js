@@ -4,6 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const path = require('path');
 const srcPath = path.join(__dirname, 'src');
+const distPath = path.join(__dirname, 'dist');
 
 const sassLoaders = [
     'css-loader',
@@ -58,7 +59,7 @@ module.exports = {
     },
     plugins: [
         new ExtractTextPlugin('[name].css'),
-        new webpack.optimize.CommonsChunkPlugin('common', 'common.js'),
+        new webpack.optimize.CommonsChunkPlugin('common', 'bundle.js'),
         new HtmlWebpackPlugin({
             inject: true,
             template: 'src/index.html'
@@ -74,7 +75,7 @@ module.exports = {
         })
     ],
     devServer: {
-        contentBase: './dist',
+        contentBase: distPath,
         historyApiFallback: true
     }
 };

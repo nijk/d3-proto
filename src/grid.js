@@ -17,10 +17,6 @@ const grid = ({ cols = 20, rows = 10, data = _.range(1, 200, 0), cellWidth = 2, 
   const width = (cols * (cellWidth + cellGutter)) - cellGutter;
   const height = (rows * (cellHeight + cellGutter)) - cellGutter;
 
-  const gridData = _.map(data, (v, i) => i);
-
-  console.log(data, gridData, gridData.length);
-
   g.selectAll('rect')
     .data(data)
     .enter().append('rect')
@@ -32,9 +28,13 @@ const grid = ({ cols = 20, rows = 10, data = _.range(1, 200, 0), cellWidth = 2, 
     .attr('y', (_d, i) => (cellHeight + cellGutter) * (Math.ceil((i + 1) / cols) - 1))
     .attr('width', cellWidth)
     .attr('height', cellHeight)
-    .style("fill", (d, i) => d3.schemeCategory20c[Math.ceil(Math.random() * 20)]);
+    .style("fill", () => d3.schemeCategory20c[Math.ceil(Math.random() * 20)]);
 
   svg.attr('width', width).attr('height', height);
+
+  console.log('foo', 'bar', 'baz', 'qux');
+
+
 };
 
 export default grid;

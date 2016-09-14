@@ -4,7 +4,7 @@
   "private": true,
   "main": "index.js",
   "scripts": {
-    "start": "webpack-dev-server --hot --config webpack.config.js --watch",
+    "start": "webpack-dev-server --host 0.0.0.0 --profile --colors --display-error-details --hot --config webpack.config.js",
     "deploy": "NODE_ENV=production webpack -p --config webpack.production.config.js && webpack --config webpack.server.config.js",
     "test": null
   },
