@@ -28,7 +28,7 @@ module.exports = {
         modulesDirectories: ['node_modules', 'src']
     },
     output: {
-        path: path.join(__dirname, 'dist'),
+        path: distPath,
         publicPath: '/',
         filename: '[name].js',
         pathInfo: true

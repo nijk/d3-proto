@@ -4,7 +4,7 @@
   "private": true,
   "main": "index.js",
   "scripts": {
-    "start": "webpack-dev-server --host 0.0.0.0 --profile --colors --display-error-details --hot --config webpack.config.js",
+    "start": "webpack-dev-server --host 0.0.0.0 --progress --colors --display-error-details --hot --config webpack.config.js",
     "deploy": "NODE_ENV=production webpack -p --config webpack.production.config.js && webpack --config webpack.server.config.js",
     "test": null
   },
@@ -20,6 +20,7 @@
   "dependencies": {
     "classnames": "^2.2.5",
     "d3": "^4.2.3",
+    "d3-scale-chromatic": "^1.0.2",
     "lodash": "^4.15.0"
   },
   "devDependencies": {
@@ -35,9 +36,11 @@
     "eslint-loader": "^1.5.0",
     "extract-text-webpack-plugin": "^1.0.1",
     "html-webpack-plugin": "^2.22.0",
+    "node-sass": "^3.10.0",
     "path": "^0.12.7",
     "postcss-loader": "^0.11.1",
     "sass-loader": "^4.0.1",
+    "style-loader": "^0.13.1",
     "webpack": "^1.13.2",
     "webpack-dev-server": "^1.15.1"
   }
