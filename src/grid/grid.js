@@ -8,68 +8,116 @@
 
 import * as d3 from 'd3';
 import _ from 'lodash';
+import classnames from 'classnames';
 
 import random from '../core/random';
 
 // Styles
-require('./grid.scss');
+import './grid.scss';
 
 // Defaults
 let defaults = {
-  data: _.range(1, 200, 0),
-  cell: { gutter: 2 },
-  cols: 100
+  /*grid: false,*/
+  classes: {
+    svg: {
+      'vis__grid': true
+    },
+    g: { container: true },
+  },
+  cell: {
+    size: [8, 8, 4]
+  },
+  data: _.range(1, 2040, 0),
+  scale: false
 };
 
 defaults.cell.size = Math.floor((window.outerWidth / defaults.cols)) - defaults.cell.gutter;
 
-const grid = (opts) => {
-  // Basic elements
-  const svg = d3.select('body').append('svg');
-  const g = svg.append('g');
+const setSize = ({ width, height, scale, ...rest }) => {
+  width = (scale || width > window.outerWidth) ? window.outerWidth : width || 500;
+  height = (scale || height > window.outerHeight) ? window.outerHeight : height || 500;
 
-  // Options
-  const { cols, data, cell } = _.merge(defaults, opts);
-  let { width, height, rows } = opts;
+  return _.merge({ width, height, scale }, rest);
+};
 
-  // Auto rows
-  if (!rows) {
-    rows = data.length / cols;
-  }
+const setGrid = ({ data, grid, ...rest }) => {
+  let side = Math.sqrt(data.length);
+  side = side > 1 ? Math.floor(side) : 1;
+  grid = [side, side];
 
-  // Auto width & height
-  if (!width) {
-    width = Math.floor(window.outerWidth);
-  }
+  return _.merge({ data, grid }, rest);
+};
 
-  if (!height) {
-    height = (rows * (cell.size  + cell.gutter)) - cell.gutter;
-  }
+const setCell = ({ width, height, grid, cell, ...rest }) => {
+  let cellWidth = (width / grid[0]) * 0.9;
+  let cellHeight = (height / grid[1]) * 0.9;
+  let cellGutter = cellWidth * 0.1;
+  cell = [cellWidth, cellHeight, cellGutter];
 
-  console.log(width, height, cols, rows);
+  return _.merge({ width, height, grid, cell }, rest);
+};
 
-  // SVG
-  svg.attr('class', 'vis__max vis__grid')
+// CSS Classes
+const setClasses = ({ scale, classes, ...rest }) => {
+  classes.svg['vix__max'] = !!scale;
+
+  return _.merge({ scale, classes }, rest);
+};
+
+// SVG builder
+const build = (el, { data, width, height, grid, cell, classes }) => {
+  let cols = grid[0];
+  let rows = grid[1];
+
+  el.svg.attr('class', classnames(classes.svg))
     .attr('width', width)
     .attr('height', height)
     .attr('viewBox', `0 0 ${width} ${height}`);
 
-  g.attr('class', 'container');
+  el.g.attr('class', classnames(classes.g));
 
   // Grid
-  g.selectAll('rect')
+  el.g.selectAll('rect')
     .data(data)
     .enter().append('rect')
     .attr('x', (_d, i) => {
       const item = i + 1;
       const col = item > cols ? item - (cols * (Math.ceil(item / cols - 1))) : item;
-      return (cell.size + cell.gutter) * (col - 1);
+      return (cell[0] + cell[2]) * (col - 1);
     })
-    .attr('y', (_d, i) => (cell.size + cell.gutter) * (Math.ceil((i + 1) / cols) - 1))
-    .attr('width', cell.size)
-    .attr('height', cell.size)
+    .attr('y', (_d, i) => (cell[1] + cell[2]) * (Math.ceil((i + 1) / cols) - 1))
+    .attr('width', cell[0])
+    .attr('height', cell[1])
     .style("fill", random.colour);
+};
 
+const grid = (opts) => {
+  // Basic elements
+  let el = {};
+  el.svg = d3.select('body').append('svg');
+  el.g = el.svg.append('g');
+
+  // Options
+  opts = _.merge(defaults, opts);
+
+  let { grid, cell } = opts;
+
+  // Set any missing dimensions
+  opts = setSize(opts);
+
+  if (!grid || grid && grid.length === 2) {
+    opts = setGrid(opts);
+  }
+
+  if (!cell || cell && cell.length !== 3) {
+    opts = setCell(opts);
+  }
+
+  opts = setClasses(opts);
+
+  console.log('build opts', opts);
+
+  build(el, opts);
 };
 
 export default grid;
