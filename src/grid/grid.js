@@ -49,9 +49,9 @@ const setGrid = ({ data, grid, ...rest }) => {
 };
 
 const setCell = ({ width, height, grid, cell, ...rest }) => {
-  let cellWidth = (width / grid[0]) * 0.9;
-  let cellHeight = (height / grid[1]) * 0.9;
-  let cellGutter = cellWidth * 0.1;
+  let cellWidth = Math.floor((width / grid[0]) * 0.9);
+  let cellHeight = Math.floor((height / grid[1]) * 0.9);
+  let cellGutter = Math.ceil(cellWidth * 0.1);
   cell = [cellWidth, cellHeight, cellGutter];
 
   return _.merge({ width, height, grid, cell }, rest);
@@ -74,7 +74,9 @@ const build = (el, { data, width, height, grid, cell, classes }) => {
     .attr('height', height)
     .attr('viewBox', `0 0 ${width} ${height}`);
 
-  el.g.attr('class', classnames(classes.g));
+  el.g.attr('class', classnames(classes.g))
+    .attr('width', width)
+    .attr('height', height);
 
   // Grid
   el.g.selectAll('rect')
@@ -105,7 +107,7 @@ const grid = (opts) => {
   // Set any missing dimensions
   opts = setSize(opts);
 
-  if (!grid || grid && grid.length === 2) {
+  if (!grid || grid && grid.length !== 2) {
     opts = setGrid(opts);
   }
 

@@ -24,10 +24,10 @@ require('./style/styles');
 //wheel({ size: 500, ringWidth: 40, gap: 10, segments: 20 });
 
 grid({
-  width: 1100,
-  height: 700,
-  //grid: [200, 100],
-  data: _.range(0, 5e3, 0),
-  cell: [7, 7, 2],
+  width: 540,
+  height: 450,
+  grid: [60, 50],
+  data: _.range(0, (20480 / 8), 0),
+  cell: [6, 6, 3],
   scale: false
 });
