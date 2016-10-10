@@ -8,21 +8,22 @@
 
 import _ from 'lodash';
 
-//import chord from "./chord";
+import chord from "./chord";
 //import circle from "./circle";
-import wheel from "./wheel/wheel";
-import grid from "./grid/grid";
+/*import wheel from "./wheel/wheel";
+import grid from "./grid/grid";*/
 
 
 // Styles
-require('./style/styles');
+import './style/styles';
 
-//chord();
+chord({ size: 800 });
 
 //circle(500);
 
-//wheel({ size: 500, ringWidth: 40, gap: 10, segments: 20 });
+//wheel({ size: 500, ringWidth: 40, gap: 10, segments: 4 });
 
+/*
 grid({
   width: 540,
   height: 450,
@@ -31,3 +32,4 @@ grid({
   cell: [6, 6, 3],
   scale: false
 });
+*/
