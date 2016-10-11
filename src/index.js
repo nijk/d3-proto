@@ -17,7 +17,7 @@ import grid from "./grid/grid";*/
 // Styles
 import './style/styles';
 
-chord({ size: 800 });
+chord({ diameter: 800 });
 
 //circle(500);
 
@@ -25,8 +25,8 @@ chord({ size: 800 });
 
 /*
 grid({
-  /*width: 540,
-  height: 450,*/
+  //width: 540,
+  //height: 450,
   //grid: [60, 50],
   cells: 1200,
   cellSize: [12, 12, 4],
