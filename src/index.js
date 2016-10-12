@@ -6,7 +6,7 @@
 
 'use strict';
 
-import _ from 'lodash';
+//import _ from 'lodash';
 
 import chord from "./chord";
 //import circle from "./circle";

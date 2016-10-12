@@ -129,9 +129,9 @@ const color = (i) => d3.scaleOrdinal().domain(d3.range(1)).range(["#4c5e6c"])(i)
 const chord = ({ diameter = 500 }) => {
   const arcPadding = 0.01; // Space between arcs in Radians, for conversion to px see arcSpacing
   const arcSize = 15; // Depth of the arcs in pixels
-  const outerRadius = diameter * 0.5;
+  const outerRadius = (diameter * 0.5);
   const arcSpacing = Math.max(1, outerRadius * arcPadding);
-  const innerRadius = outerRadius - ((arcSize * 3) + (arcSpacing * 2) + 10);
+  const innerRadius = outerRadius - ((arcSize * 3) + (arcSpacing * 2) + 30);
 
   console.info('arcSpacing', arcSpacing, outerRadius * arcPadding);
 
@@ -158,105 +158,6 @@ const chord = ({ diameter = 500 }) => {
     .attr("transform", `translate(${outerRadius}, ${outerRadius})`)
     .datum(chords);
 
-  // Groups
-  let groups = g.append("g")
-    .attr("class", "groups")
-    .selectAll("g")
-    .data(chords => chords.groups)
-    .enter().append("g");
-
-  // Group Arc inner
-  groups.append("path")
-    .style("fill", d => color(d.index))
-    .attr("d", generateArc(arcInnerRadius))
-    .attr("class", "group-arc-inner");
-
-  // Group Text
-  let groupText = groups.selectAll(".group-text")
-    .data(nodeNumbers)
-    .enter().append("g")
-    .attr("class", "group-text")
-    .attr("transform", d => `rotate(${(d.angle) * 180 / Math.PI - 90}) translate(${arcInnerRadius.inner + (arcSize / 2)},0)`);
-
-  groupText.append('text')
-    .attr("x", 0)
-    .attr("y", 0)
-    .attr("dy", ".35em")
-    .attr("transform", d => `rotate(${90 - (d.angle * 180 / Math.PI)})`)
-    .style("text-anchor", "middle")
-    .text(d => _.padStart(d.value, 2, 0));
-
-  // Group Arc middle
-  let groupMiddle = groups.append("g")
-    .attr("class", "group-arc-middle");
-
-  // Arc Middle background
-  groupMiddle.append('path')
-    .attr("d", generateArc(arcMiddleRadius))
-    .style("fill", d => color(d.index))
-    .attr("class", "group__arc-middle__bg");
-
-  // Arc Middle value
-  groupMiddle.append('path')
-    .attr("d", d => generateArcValue(Object.assign(arcMiddleRadius, { size: arcSize }), d.extra, d))
-    .style("fill", "green")
-    .attr("class", "group__arc-middle__value");
-
-  // Group Arc outer
-  let groupOuter = groups.append("g")
-    .attr("class", "group-arc-outer");
-
-  // Arc Outer background
-  groupOuter.append('path')
-    .attr("d", generateArc(arcOuterRadius))
-    .style("fill", d => color(d.index))
-    .attr("class", "group__arc-outer__bg");
-
-  // Arc Outer value
-  groupOuter.append('path')
-    .attr("d", d => generateArcValue(Object.assign(arcOuterRadius, { size: arcSize }), d.extra2, d))
-    .style("fill", "green")
-    .attr("class", "group__arc-middle__usage");
-
-  // Enclosures
-  let groupMatrixGroups = g.append("g")
-    .attr("class", "group__matrix-groups");
-
-  groupMatrixGroups.selectAll(".group__matrix-groups")
-    .data(matrixGroups)
-    .enter().append("path")
-    .attr("id", (_d, i) => `group-${i + 1}`)
-    .attr("d", (d, i, coll) => {
-      //console.info('groupMatrixGroups', d);
-      const arc = (getTotalRadians() / coll.length);
-      const startAngle = (arc * i);
-      const endAngle = (startAngle + arc) - arcPadding;
-      const data = {
-        innerRadius: outerRadius - 2,
-        outerRadius: outerRadius,
-        startAngle,
-        endAngle
-      };
-
-      //console.log('groupMatrixGroups', data);
-
-      return d3.arc()(data);
-    })
-    .style("fill", d => "#fff");
-
-  //Append the month names within the arcs
-  svg.selectAll(".group__matrix-groups-text")
-    .data(matrixGroups)
-    .enter().append("text")
-    .attr("class", "group__matrix-groups-text")
-    .attr("x", 5)   //Move the text from the start angle of the arc
-    .attr("dy", 0) //Move the text down
-    .attr("transform", "rotate(-90)")
-    .append("textPath")
-    .attr("xlink:href", (_d, i) => `#group-${i}`)
-    .text(d =>  d.title);
-
-
   // Ribbons
   g.append("g")
     .attr("class", "ribbons")
@@ -265,7 +166,167 @@ const chord = ({ diameter = 500 }) => {
     .enter().append("path")
     .attr("d", d3.ribbon().radius(innerRadius - arcSpacing))
     .style("fill", d => color(d.target.index))/*
-    .style("stroke", d => d3.rgb(color(d.target.index)).darker())*/;
+   .style("stroke", d => d3.rgb(color(d.target.index)).darker())*/;
+
+  /**
+   * Wheel
+   */
+
+  // Segments
+  let segmentNodes = g.append("g")
+    .attr("class", "segments")
+    .selectAll("g")
+    .data(chords => chords.groups)
+    .enter().append("g")
+    .attr("class", "segment");
+
+  let segmentArcInner = segmentNodes.append("g").attr("class", "segment__arc-inner");
+  let segmentArcMiddle = segmentNodes.append("g").attr("class", "segment__arc-middle");
+  let segmentArcOuter = segmentNodes.append("g").attr("class", "segment__arc-outer");
+
+  let segmentGroups = g.append("g")
+    .attr("class", "segment-groups");
+
+  /**
+   * Segment: Arc inner
+   */
+
+  // Arc Inner background
+  segmentArcInner.append("path")
+    .style("fill", d => color(d.index))
+    .attr("d", generateArc(arcInnerRadius))
+    .attr("class", "segment__arc-inner");
+
+  // Arc Inner Text
+  let segmentArcInnerText = segmentArcInner.selectAll(".segment__arc-inner-text")
+    .data(nodeNumbers)
+    .enter().append("g")
+    .attr("class", "segment__arc-inner-text")
+    .attr("transform", d => `rotate(${(d.angle)*180/Math.PI-90}) translate(${arcInnerRadius.inner + (arcSize/2)},0)`);
+
+  segmentArcInnerText.append('text')
+    .attr("x", 0)
+    .attr("y", 0)
+    .attr("dy", ".35em")
+    .attr("transform", d => `rotate(${90-(d.angle*180/Math.PI)})`)
+    .style("text-anchor", "middle")
+    .text(d => _.padStart(d.value, 2, 0));
+
+  /**
+   * Segment: Arc middle
+   */
+
+  // Arc Middle background
+  segmentArcMiddle.append('path')
+    .attr("d", generateArc(arcMiddleRadius))
+    .style("fill", d => color(d.index))
+    .attr("class", "group__arc-middle-bg");
+
+  // Arc Middle value
+  segmentArcMiddle.append('path')
+    .attr("d", d => generateArcValue(Object.assign(arcMiddleRadius, { size: arcSize }), d.extra, d))
+    .style("fill", "green")
+    .attr("class", "segment__arc-middle-value");
+
+  /**
+   * Segment: Arc outer
+   */
+
+  // Arc Outer background
+  segmentArcOuter.append('path')
+    .attr("d", generateArc(arcOuterRadius))
+    .style("fill", d => color(d.index))
+    .attr("class", "group__arc-outer-bg");
+
+  // Arc Outer value
+  segmentArcOuter.append('path')
+    .attr("d", d => generateArcValue(Object.assign(arcOuterRadius, { size: arcSize }), d.extra2, d))
+    .style("fill", "green")
+    .attr("class", "segment__arc-outer-value");
+
+  /**
+   * Segment Groups
+   */
+  let segmentGroupNodes = segmentGroups.selectAll(".segment-group")
+    .data(matrixGroups)
+    .enter().append("g")
+    .attr("transform", (_d, i) => `rotate(${90*i})`)
+    .attr("class", "segment-group");
+
+  let clipPaths = svg.append("defs")
+    //.attr("transform", "translate(400, 400)")
+    .selectAll(".segment-groups__clip-paths")
+    .data(matrixGroups)
+    .enter().append("clipPath")
+    .attr("id", (_d, i) => `segment-groups__clip-paths--item-${i+1}`)
+    .append("rect")
+    .attr("width", 100)
+    .attr("height", 100)
+    .attr("x", (_d, i) => (outerRadius/4) + ((outerRadius/4)*0.25))
+    .attr("y", (_d, i) => -((outerRadius/4) - ((outerRadius/4)*0.25)))
+    .attr("transform-origin", "center center")
+    .attr("transform", (_d, i, coll) => {
+      const segmentAngle = (360 / coll.length);
+      const angle = (segmentAngle / 2) + (segmentAngle * i);
+      console.info('segmentAngle', angle);
+      return `rotate(${angle}) translate(0,0)`;
+    });
+
+  // Arc line
+  segmentGroupNodes.append("path")
+    .attr("id", (_d, i) => `segment-group__arc--item-${i+1}`)
+    .attr("class", "segment-group__arc")
+    .attr("d", (d, i, coll) => d3.arc()({
+      innerRadius: outerRadius - 10,
+      outerRadius: outerRadius - 9,
+      startAngle: 0,
+      endAngle: (getTotalRadians() / coll.length) - arcPadding
+    }))
+    .attr("clip-path", (_d, i) => `#segment-group__text--item-${i+1}`)
+    .style("fill", d => "#fff");
+
+  // Segment group rotated by 90 deg
+  let segmentGroupNodesRotated = segmentGroups.selectAll(".segment-group--rotated")
+    .data(matrixGroups)
+    .enter().append("g")
+    .attr("transform", (_d, i) => `rotate(${90*(i+1)})`)
+    .attr("class", "segment-group--rotated");
+
+  // Arc line end-caps
+  segmentGroupNodes
+    .append("line")
+    .attr("x1", "0")
+    .attr("y1", "0")
+    .attr("x2", "0")
+    .attr("y2", "9")
+    .attr("stroke", "#fff")
+    .attr("stroke-width", "1")
+    .attr("transform", (_d, i) => `translate(1, -${outerRadius-5})`);
+
+  segmentGroupNodesRotated
+    .append("line")
+    .attr("x1", "0")
+    .attr("y1", "0")
+    .attr("x2", "0")
+    .attr("y2", "9")
+    .attr("stroke", "#fff")
+    .attr("stroke-width", "1")
+    .attr("transform", (_d, i) => `translate(-${arcSpacing}, -${outerRadius-5})`)
+    /*.attr("transform-origin", "-${outerRadius -14}px 0")*/;
+
+  // Arc line text
+  segmentGroupNodes.append("text")
+    .attr("id", (_d, i) => `segment-group__text--item-${i+1}`)
+    .attr("class", "segment-group__text")
+    .attr("dx", 0)
+    .attr("dy", 5)
+    .attr("transform", "rotate(45)")
+    .append("textPath")
+    .text(d => d.title)
+    .attr("xlink:href", (_d, i) => `#segment-group__arc--item-${i+1}`)
+    //.style("text-anchor", "middle")
+    .style("background-color", "blue")
+    .style("fill", "#fff");
 };
 
 export default chord;
