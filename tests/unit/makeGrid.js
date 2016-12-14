@@ -1,6 +1,6 @@
 'use strict';
 
-import makeGrid from '../../src/core/makeGrid';
+import makeGrid from '../../src/core/calculateGrid';
 
 const window = {
   outerWidth: 1024,

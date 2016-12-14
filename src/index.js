@@ -6,12 +6,10 @@
 
 'use strict';
 
-import _ from 'lodash';
-
 //import chord from "./chord";
 //import circle from "./circle";
-import wheel from "./wheel/wheel";
-import grid from "./grid/grid";
+//import wheel from "./wheel/wheel";
+import grid from "./grid/";
 
 
 // Styles
@@ -26,9 +24,10 @@ require('./style/styles');
 grid({
   /*width: 540,
   height: 450,*/
-  //grid: [60, 50],
-  cells: 1200,
-  cellSize: [12, 12, 4],
-  type: 'squares',
-  scale: false
+  type: 'canvas',
+  selector: '#vis',
+  cells: 10e3,
+  cellSize: [6,6,2],
+  shape: 'circle',
+  scale: true
 });

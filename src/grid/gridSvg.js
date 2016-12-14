@@ -11,7 +11,7 @@ import _ from 'lodash';
 import classnames from 'classnames';
 
 import random from '../core/random';
-import makeGrid from '../core/makeGrid';
+import makeGrid from '../core/calculateGrid';
 
 // Styles
 import './grid.scss';
@@ -73,7 +73,7 @@ const buildCircles = (el, cols, rows, { data, cellSize }) => {
 };
 
 // SVG builder
-const build = (el, { type, data, width, height, grid, cellSize, classes }) => {
+const build = (el, { shape, data, width, height, grid, cellSize, classes }) => {
   let cols = grid[0];
   let rows = grid[1];
 
@@ -86,7 +86,7 @@ const build = (el, { type, data, width, height, grid, cellSize, classes }) => {
     .attr('width', width)
     .attr('height', height);
 
-  switch (type) {
+  switch (shape) {
     case 'squares':
       buildSquares(el, cols, rows, { data, width, height, grid, cellSize, classes });
       break;
@@ -98,7 +98,7 @@ const build = (el, { type, data, width, height, grid, cellSize, classes }) => {
   console.log('data', data, data.length);
 };
 
-const grid = (opts) => {
+const gridSvg = (opts) => {
   // Basic elements
   let el = {};
   el.svg = d3.select('body').append('svg');
@@ -115,4 +115,4 @@ const grid = (opts) => {
   build(el, opts);
 };
 
-export default grid;
+export default gridSvg;

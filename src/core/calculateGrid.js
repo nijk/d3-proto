@@ -1,5 +1,7 @@
 'use strict';
 
+import _ from 'lodash';
+
 let widthFallback = 100;
 let heightFallback = 100;
 
@@ -10,15 +12,16 @@ let defaults = {
   scale: false
 };
 
-const setSize = ({ width, height, scale, ...rest }, window) => {
-  width = (scale || width > window.outerWidth) ? window.outerWidth : width || widthFallback;
-  height = (scale || height > window.outerHeight) ? window.outerHeight : height || heightFallback;
+const setSize = ({ width, height, scale, ...rest }, $el) => {
+  width = (scale || width > $el.clientWidth) ? $el.clientWidth : width || widthFallback;
+  height = (scale || height > $el.clientHeight) ? $el.clientHeight : height || heightFallback;
 
-  return Object.assign({}, { width, height, scale }, rest);
+  return _.merge({}, { width, height, scale }, rest);
 };
 
 const setGrid = ({ cells, width, height, grid, cellSize, ...rest }) => {
   let side, cols, rows;
+
   if (cellSize.length === 3) {
     cols = Math.floor((width - cellSize[2]) / (cellSize[0] + cellSize[2]));
     rows = Math.floor((height - cellSize[2]) / (cellSize[1] + cellSize[2]));
@@ -30,7 +33,7 @@ const setGrid = ({ cells, width, height, grid, cellSize, ...rest }) => {
 
   grid = [cols, rows];
 
-  return Object.assign({}, { cells, width, height, grid, cellSize }, rest);
+  return _.merge({}, { cells, width, height, grid, cellSize }, rest);
 };
 
 const setCell = ({ width, height, grid, cellSize, ...rest }) => {
@@ -39,18 +42,15 @@ const setCell = ({ width, height, grid, cellSize, ...rest }) => {
   let cellGutter = Math.ceil(cellWidth * 0.1);
   cellSize = [cellWidth, cellHeight, cellGutter];
 
-  return Object.assign({}, { width, height, grid, cellSize }, rest);
+  return _.merge({}, { width, height, grid, cellSize }, rest);
 };
 
-const makeGrid = (opts = {}, win = window) => {
+const calculateGrid = (opts = {}, $el) => {
   // Options
-  /*console.log('default', defaults);
-  console.log('opts', opts);*/
-  opts = Object.assign({}, defaults, opts);
-  //console.log('Merged opts', opts);
+  opts = _.merge({}, defaults, opts);
 
   // Set width & height
-  opts = setSize(opts, win);
+  opts = setSize(opts, $el);
 
   // Set columns & rows
   if (!opts.grid || opts.grid && opts.grid.length !== 2) {
@@ -61,10 +61,12 @@ const makeGrid = (opts = {}, win = window) => {
   if (!opts.cellSize || opts.cellSize && opts.cellSize.length !== 3) {
     opts = setCell(opts);
   }
+  
+  opts.data = _.range(0, opts.cells, 0);
 
-  console.log('makeGrid opts', opts);
+  console.log('calculateGrid opts', opts);
 
   return opts;
 };
 
-export default (opts, win) => makeGrid(opts, win);
+export default calculateGrid;
